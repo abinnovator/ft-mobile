@@ -32,3 +32,9 @@ jobs:
 
       - name: 🚀 Build APK Locally on GitHub
         run: eas build -p android --profile preview --local --non-interactive
+      - name: 📦 Upload APK Artifact
+        uses: actions/checkout@v4 # Re-confirming path
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flavortown-apk
+          path: build-*.apk # This matches the filename from your logs
