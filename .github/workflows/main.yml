@@ -1,9 +1,9 @@
 name: Build Android APK
 on:
-  workflow_dispatch: # Allows you to run it manually from the Actions tab
+  workflow_dispatch: # Allows you to run it manually from the "Actions" tab
   push:
     branches:
-      - main # Or whatever your main branch is called
+      - main # Make sure this matches your main branch name
 
 jobs:
   build:
@@ -22,13 +22,15 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
-          eas-cache: true
+          eas-version: latest # Forces GitHub to use the newest EAS CLI
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 📦 Install Dependencies
         run: |
           npm install
-          npm install -g eas-cli
+          npm install -g eas-cli@latest --force
 
       - name: 🚀 Build APK Locally on GitHub
-        run: eas build -p android --profile preview --local
+        # The --local flag uses GitHub's CPU instead of the EAS cloud queue
+        # The --non-interactive flag prevents it from asking questions
+        run: eas build -p android --profile preview --local --non-interactive
