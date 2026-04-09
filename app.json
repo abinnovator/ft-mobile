@@ -19,7 +19,6 @@
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/flavortown_logo.png",
-        "backgroundImage": "./assets/BG.webp",
         "monochromeImage": "./assets/flavortown_logo.png"
       },
       "edgeToEdgeEnabled": true,
