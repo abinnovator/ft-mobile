@@ -172,13 +172,13 @@ export default function Explore() {
               <View key={u.id} className="bg-[#313244] p-4 rounded-xl flex-row justify-between items-center border border-white/5">
                 <View>
                   <TouchableOpacity 
-                                          onPress={() => router.push(`/users/${u.id}`)}
-                                          className="text-white text-lg"
-                                      >
-                                          <Text className="text-red-500 text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>
-                                              {u.display_name || "Unknown Hacker"}
-                                          </Text>
-                                      </TouchableOpacity>
+                      onPress={() => router.push(`/users/${u.id}`)}
+                      className="text-white text-lg"
+                  >
+                      <Text className="text-red-500 text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>
+                          {u.display_name || "Unknown Hacker"}
+                      </Text>
+                  </TouchableOpacity>
                   <Text className="text-gray-500 text-xs">@{u.slack_id}</Text>
                 </View>
                 <View className="items-end">
