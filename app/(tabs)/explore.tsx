@@ -1,7 +1,8 @@
 import ExplorePageProjectDevlogCard from "@/components/ExplorePageProjectDevlogCard";
-import { getApiKey, getUserID } from "@/lib/authStore";
+import { getApiKey } from "@/lib/authStore";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, ImageBackground, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ImageBackground, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 interface Project {
   id: number;
@@ -11,89 +12,108 @@ interface Project {
   created_at: string;
 }
 
-// Define the User type based on API response
 interface User {
   id: number;
-  name: string;
   slack_id: string;
-  cookie_count: number;
+  display_name: string;
+  avatar: string;
+  cookies: number | null;
 }
 
 export default function Explore() {
   const [activeTab, setActiveTab] = useState<'projects' | 'devlogs' | 'users'>('devlogs');
   const [devlogs, setDevlogs] = useState([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [users, setUsers] = useState<User[]>([]); // State for users
   const [loading, setLoading] = useState(true);
-  const [hasId, setHasId] = useState(true);
+  
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [projectPage, setProjectPage] = useState(1);
+  const [hasMoreProjects, setHasMoreProjects] = useState(true);
+
+  const [users, setUsers] = useState<User[]>([]);
+  const [userPage, setUserPage] = useState(1);
+  const [hasMoreUsers, setHasMoreUsers] = useState(true);
+
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const router = useRouter();
+
+  const getHeaders = async () => {
+    const storedKey = await getApiKey();
+    const activeKey = storedKey || process.env.BASE_FT_API || "";
+    return { "Authorization": `Bearer ${activeKey}` };
+  };
 
   const fetchRandomDevlogs = async () => {
     try {
       const response = await fetch('http://ftpdb.jam06452.uk/api/random_devlogs');
       const data = await response.json();
       setDevlogs(data);
-    } catch (error) {
-      console.error("Devlog Fetch error:", error);
-    }
+    } catch (e) { console.error("Devlog error:", e); }
   };
 
-  const fetchGlobalProjects = async (activeKey: string) => {
+  const fetchProjects = async (page: number) => {
     try {
-      const response = await fetch('https://flavortown.hackclub.com/api/v1/projects?page=1&limit=10', {
-        headers: { "Authorization": `Bearer ${activeKey}` }
-      });
+      const headers = await getHeaders();
+      const response = await fetch(`https://flavortown.hackclub.com/api/v1/projects?page=${page}&limit=10`, { headers });
       const data = await response.json();
-      setProjects(data.projects || []);
-    } catch (error) {
-      console.error("Project Fetch error:", error);
-    }
+      
+      if (data.projects && data.projects.length > 0) {
+        setProjects(prev => page === 1 ? data.projects : [...prev, ...data.projects]);
+        setHasMoreProjects(data.pagination.next_page !== null);
+
+      } else {
+        setHasMoreProjects(false);
+      }
+    } catch (e) { console.error("Project error:", e); }
   };
 
-  const fetchGlobalUsers = async (activeKey: string) => {
+  const fetchUsers = async (page: number) => {
     try {
-      const response = await fetch('https://flavortown.hackclub.com/api/v1/users?page=1&limit=20', {
-        headers: { "Authorization": `Bearer ${activeKey}` }
-      });
+      const headers = await getHeaders();
+      const response = await fetch(`https://flavortown.hackclub.com/api/v1/users?page=${page}&limit=20`, { headers });
       const data = await response.json();
-      setUsers(data.users || []);
-    } catch (error) {
-      console.error("User Fetch error:", error);
-    }
+      
+      if (data.users && data.users.length > 0) {
+        setUsers(prev => page === 1 ? data.users : [...prev, ...data.users]);
+        setHasMoreUsers(data.pagination.next_page !== null);
+      } else {
+        setHasMoreUsers(false);
+      }
+    } catch (e) { console.error("User error:", e); }
   };
 
-  const loadAllData = async () => {
+  const loadInitialData = async () => {
     setLoading(true);
-    const storedId = await getUserID();
-    const storedKey = await getApiKey();
-
-    if (!storedId) {
-      setHasId(false);
-      setLoading(false);
-      return;
-    }
-
-    const activeKey = storedKey || process.env.BASE_FT_API || "";
-
-    // Parallel fetch for all three datasets
-    await Promise.all([
-      fetchRandomDevlogs(),
-      fetchGlobalProjects(activeKey),
-      fetchGlobalUsers(activeKey)
-    ]);
-    
+    await Promise.all([fetchRandomDevlogs(), fetchProjects(1), fetchUsers(1)]);
     setLoading(false);
   };
 
-  useEffect(() => {
-    loadAllData();
-  }, []);
+  const handleScroll = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (isFetchingMore || loading) return;
+
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 100;
+
+    if (isCloseToBottom) {
+      if (activeTab === 'projects' && hasMoreProjects) {
+        setIsFetchingMore(true);
+        const nextPage = projectPage + 1;
+        await fetchProjects(nextPage);
+        setProjectPage(nextPage);
+        setIsFetchingMore(false);
+      } else if (activeTab === 'users' && hasMoreUsers) {
+        setIsFetchingMore(true);
+        const nextPage = userPage + 1;
+        await fetchUsers(nextPage);
+        setUserPage(nextPage);
+        setIsFetchingMore(false);
+      }
+    }
+  };
+
+  useEffect(() => { loadInitialData(); }, []);
 
   return (
-    <ImageBackground 
-      source={require("@/assets/BG.webp")} 
-      className="flex-1"
-      resizeMode="cover"
-    >
+    <ImageBackground source={require("@/assets/BG.webp")} className="flex-1" resizeMode="cover">
       <View className="flex-1 items-center pt-20">
         <Text className="text-3xl text-white bg-[#313244] py-2 px-10 rounded-[10px] mb-6" style={{ fontFamily: "Jua_400Regular" }}>
           Explore
@@ -106,23 +126,21 @@ export default function Explore() {
               onPress={() => setActiveTab(tab as any)}
               className={`flex-1 py-2 rounded-[8px] ${activeTab === tab ? 'bg-[#ff8c00]' : ''}`}
             >
-              <Text 
-                className={`text-center capitalize ${activeTab === tab ? 'text-white' : 'text-gray-400'}`}
-                style={{ fontFamily: "Jua_400Regular" }}
-              >
+              <Text className={`text-center capitalize ${activeTab === tab ? 'text-white' : 'text-gray-400'}`} style={{ fontFamily: "Jua_400Regular" }}>
                 {tab}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* --- CONTENT AREA --- */}
         {loading ? (
           <ActivityIndicator size="large" color="#ff8c00" style={{ marginTop: 50 }} />
         ) : (
           <ScrollView 
             className="flex-1 w-full px-11"
-            contentContainerStyle={{ paddingTop: 20, paddingBottom: 40, gap: 20 }}
+            contentContainerStyle={{ paddingTop: 20, paddingBottom: 60, gap: 20 }}
+            onScroll={handleScroll}
+            scrollEventThrottle={400}
             showsVerticalScrollIndicator={false}
           >
             {activeTab === 'devlogs' && devlogs.map((log, index) => (
@@ -132,13 +150,15 @@ export default function Explore() {
                 time={new Date(log.created_at).toLocaleDateString()}
                 timeLogged={`${log.total_hours}h`} 
                 description={log.body} 
+                project={log.title || "Project"}
+                id={log.id}
               />
             ))}
 
             {activeTab === 'projects' && projects.map((project) => (
               <View key={project.id} className="bg-[#313244] p-5 rounded-2xl border border-white/10">
                 <View className="flex-row justify-between items-center mb-2">
-                   <Text className="text-[#ff8c00] text-xl" style={{ fontFamily: "Jua_400Regular" }}>{project.title}</Text>
+                   <TouchableOpacity onPress={() => router.push({ pathname: `/project/${project.id}` as any })}><Text className="text-[#ff8c00] text-xl" style={{ fontFamily: "Jua_400Regular" }}>{project.title}</Text></TouchableOpacity>
                    <View className="bg-[#ff8c00]/20 px-2 py-1 rounded-md">
                       <Text className="text-[#ff8c00] text-xs uppercase font-bold">{project.ship_status}</Text>
                    </View>
@@ -151,14 +171,27 @@ export default function Explore() {
             {activeTab === 'users' && users.map((u) => (
               <View key={u.id} className="bg-[#313244] p-4 rounded-xl flex-row justify-between items-center border border-white/5">
                 <View>
-                  <Text className="text-white text-lg" style={{ fontFamily: "Jua_400Regular" }}>{u.display_name}</Text>
+                  <TouchableOpacity 
+                                          onPress={() => router.push(`/users/${u.id}`)}
+                                          className="text-white text-lg"
+                                      >
+                                          <Text className="text-red-500 text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>
+                                              {u.display_name || "Unknown Hacker"}
+                                          </Text>
+                                      </TouchableOpacity>
                   <Text className="text-gray-500 text-xs">@{u.slack_id}</Text>
                 </View>
                 <View className="items-end">
-                  <Text className="text-white text-lg " style={{ fontFamily: "Jua_400Regular" }}>{u.cookies ? u.cookies : 0} 🍪</Text>
+                  <Text className="text-white text-lg" style={{ fontFamily: "Jua_400Regular" }}>{u.cookies ?? 0} 🍪</Text>
                 </View>
               </View>
             ))}
+
+            {isFetchingMore && (
+              <View className="py-4">
+                <ActivityIndicator size="small" color="#ff8c00" />
+              </View>
+            )}
           </ScrollView>
         )}
       </View>

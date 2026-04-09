@@ -1,7 +1,8 @@
-import { getApiKey } from "@/lib/authStore";
+import NoKey from "@/components/NoKey";
+import { getApiKey, getUserID } from "@/lib/authStore";
 import * as Haptics from 'expo-haptics';
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -14,56 +15,96 @@ import {
 } from "react-native";
 
 const NewProject = () => {
+    const router = useRouter();
+    const { id } = useLocalSearchParams();
+    const isEditing = !!id;
+
     const [isSaving, setIsSaving] = useState(false);
-      const router = useRouter();
-    
-    
-    // Form State based on your Schema
+    const [hasAuth, setHasAuth] = useState(false);
+    const [loading, setLoading] = useState(true);
+
     const [form, setForm] = useState({
         title: "",
         description: "",
         repo_url: "",
         demo_url: "",
         banner_url: "",
-        ai_declaration: "I used AI to help with the boilerplate and logic debugging." 
+        ai_declaration: "I used AI to help with the boilerplate and logic debugging."
     });
 
+    useEffect(() => {
+        const preparePage = async () => {
+            try {
+                const key = await getApiKey();
+                const userId = await getUserID();
+
+                if (key && userId) {
+                    setHasAuth(true);
+                    
+                    if (isEditing) {
+                        const response = await fetch(`https://flavortown.hackclub.com/api/v1/projects/${id}`, {
+                            headers: { "Authorization": `Bearer ${key}` }
+                        });
+                        const data = await response.json();
+                        if (response.ok) {
+                            setForm({
+                                title: data.title || "",
+                                description: data.description || "",
+                                repo_url: data.repo_url || "",
+                                demo_url: data.demo_url || "",
+                                banner_url: data.banner_url || "",
+                                ai_declaration: data.ai_declaration || form.ai_declaration
+                            });
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Preparation failed", e);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        preparePage();
+    }, [id]);
+
     const handleShip = async () => {
-        // Basic Validation
         if (!form.title || !form.description) {
-            Alert.alert("Wait!", "Title and Description are required to ship.");
+            Alert.alert("Wait!", "Title and Description are required.");
             return;
         }
 
         setIsSaving(true);
         try {
             const token = await getApiKey();
+            const url = isEditing 
+                ? `https://flavortown.hackclub.com/api/v1/projects/${id}` 
+                : "https://flavortown.hackclub.com/api/v1/projects";
             
-            const response = await fetch("https://flavortown.hackclub.com/api/v1/projects", {
-                method: "POST",
+            const response = await fetch(url, {
+                method: isEditing ? "PATCH" : "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    title: form.title,
-                    description: form.description,
-                    repo_url: form.repo_url,
-                    demo_url: form.demo_url,
+                    ...form,
                     banner_url: form.banner_url || null,
-                    ai_declaration: form.ai_declaration,
-                    ship_status: "shipped" // Defaulting to shipped for the sidequest
+                    ship_status: "shipped"
                 })
             });
 
             if (response.ok) {
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                Alert.alert("🚀 Shipped!", "Your project is now live in Flavortown.");
-                // Clear form
-                setForm({ title: "", description: "", repo_url: "", demo_url: "", banner_url: "", ai_declaration: "" });
+                Alert.alert(
+                    isEditing ? "Updated!" : "🚀 Shipped!", 
+                    isEditing ? "Your changes are live." : "Your project is now live in Flavortown."
+                );
+                router.replace("/explore"); // Go to explore to see the new/updated card
             } else {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
                 const errData = await response.json();
-                Alert.alert("Error", errData.message || "Failed to ship project.");
+                Alert.alert("Error", errData.message || "Action failed.");
             }
         } catch (error) {
             Alert.alert("Network Error", "Could not connect to Flavortown.");
@@ -72,15 +113,24 @@ const NewProject = () => {
         }
     };
 
+
+    if (loading) {
+        return (
+            <ImageBackground source={require("@/assets/BG.webp")} className="flex-1 justify-center items-center">
+                <ActivityIndicator size="large" color="#ff8c00" />
+            </ImageBackground>
+        );
+    }
+
+    if (!hasAuth) {
+        return <NoKey />;
+    }
+
     return (
-        <ImageBackground 
-            source={require("@/assets/BG.webp")} 
-            className="flex-1"
-            resizeMode="cover"
-        >
+        <ImageBackground source={require("@/assets/BG.webp")} className="flex-1" resizeMode="cover">
             <View className="flex-1 items-center pt-20">
                 <Text className="text-3xl text-white bg-[#313244] py-2 px-10 rounded-[10px]" style={{ fontFamily: "Jua_400Regular" }}>
-                    New Project
+                    {isEditing ? "Edit Project" : "New Project"}
                 </Text>
                 
                 <ScrollView 
@@ -88,7 +138,6 @@ const NewProject = () => {
                     contentContainerStyle={{ paddingTop: 40, paddingBottom: 40, gap: 20 }}
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* Project Title */}
                     <View className="bg-[#303143] rounded-[20px] p-5">
                         <Text className="text-white mb-2" style={{ fontFamily: "Jua_400Regular" }}>Project Title</Text>
                         <TextInput
@@ -100,22 +149,19 @@ const NewProject = () => {
                         />
                     </View>
 
-                    {/* Description - Multi-line */}
                     <View className="bg-[#303143] rounded-[20px] p-5">
                         <Text className="text-white mb-2" style={{ fontFamily: "Jua_400Regular" }}>Description</Text>
                         <TextInput
                             placeholder="What did you build?"
                             placeholderTextColor="#666"
                             multiline
-                            numberOfLines={4}
                             onChangeText={(text) => setForm({...form, description: text})}
                             value={form.description}
                             className="text-white"
-                            style={{ textAlignVertical: 'top' }}
+                            style={{ textAlignVertical: 'top', minHeight: 80 }}
                         />
                     </View>
 
-                    {/* Repo URL */}
                     <View className="bg-[#303143] rounded-[20px] p-5">
                         <Text className="text-white mb-2" style={{ fontFamily: "Jua_400Regular" }}>Github URL</Text>
                         <TextInput
@@ -128,7 +174,6 @@ const NewProject = () => {
                         />
                     </View>
 
-                    {/* Banner Image URL */}
                     <View className="bg-[#303143] rounded-[20px] p-5">
                         <Text className="text-white mb-2" style={{ fontFamily: "Jua_400Regular" }}>Banner Image URL</Text>
                         <TextInput
@@ -141,7 +186,6 @@ const NewProject = () => {
                         />
                     </View>
 
-                    {/* Ship Button */}
                     <TouchableOpacity 
                         onPress={handleShip}
                         disabled={isSaving}
@@ -151,22 +195,19 @@ const NewProject = () => {
                             <ActivityIndicator color="white" />
                         ) : (
                             <Text className="text-white text-[20px]" style={{ fontFamily: "Jua_400Regular" }}>
-                                Ship to Flavortown 🚀
+                                {isEditing ? "Save Changes " : "Ship to Flavortown "}
                             </Text>
                         )}
                     </TouchableOpacity>
+
                     <TouchableOpacity 
                         onPress={() => router.back()}
                         disabled={isSaving}
-                        className={`mt-5 py-4 rounded-[15px] items-center ${isSaving ? 'bg-gray-500' : 'bg-red-600'}`}
+                        className="mt-2 py-4 rounded-[15px] items-center border border-red-500"
                     >
-                        {isSaving ? (
-                            <ActivityIndicator color="white" />
-                        ) : (
-                            <Text className="text-white text-[20px]" style={{ fontFamily: "Jua_400Regular" }}>
-                                Cancel
-                            </Text>
-                        )}
+                        <Text className="text-red-500 text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>
+                            Cancel
+                        </Text>
                     </TouchableOpacity>
 
                 </ScrollView>
