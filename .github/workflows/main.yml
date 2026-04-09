@@ -1,9 +1,9 @@
 name: Build Android APK
 on:
-  workflow_dispatch: # Allows you to run it manually from the "Actions" tab
+  workflow_dispatch:
   push:
     branches:
-      - main # Make sure this matches your main branch name
+      - main
 
 jobs:
   build:
@@ -12,17 +12,17 @@ jobs:
       - name: 🏗 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node
+      - name: 🟢 Setup Node (Upgraded to v20)
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20 # <--- This fixes the "Incompatible Module" error
           cache: 'npm'
 
       - name: 🛠 Setup Expo & EAS
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
-          eas-version: latest # Forces GitHub to use the newest EAS CLI
+          eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 📦 Install Dependencies
@@ -31,6 +31,4 @@ jobs:
           npm install -g eas-cli@latest --force
 
       - name: 🚀 Build APK Locally on GitHub
-        # The --local flag uses GitHub's CPU instead of the EAS cloud queue
-        # The --non-interactive flag prevents it from asking questions
         run: eas build -p android --profile preview --local --non-interactive
