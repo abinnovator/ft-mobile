@@ -97,8 +97,7 @@ const Profile = () => {
                     contentContainerStyle={{ paddingTop: 80, paddingBottom: 40, gap: 25 }}
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* <Image source={user? user.avatar : require("@/assets/profile.png")} className="w-[289px] h-[157px] rounded-[10px]" /> */}
-                    {/* API Key Field */}
+
                     <View className="bg-[#303143] rounded-[20px] p-5 flex-row items-center gap-4">
                         <Text className="text-white text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>API Key:</Text>
                         <TextInput
@@ -112,7 +111,6 @@ const Profile = () => {
                         />
                     </View>
 
-                    {/* User ID Field */}
                     <View className="bg-[#303143] rounded-[20px] p-5 flex-row items-center gap-4">
                         <Text className="text-white text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>User ID:</Text>
                         <TextInput
@@ -125,7 +123,6 @@ const Profile = () => {
                         />
                     </View>
 
-                    {/* The Save Button */}
                     <TouchableOpacity 
                         onPress={handleSave}
                         disabled={isSaving}

@@ -1,16 +1,16 @@
 import { getApiKey, getUserID } from "@/lib/authStore";
-import { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useState } from "react";
 import { ImageBackground, Text, View } from "react-native";
 
 export default function Home() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [hasId, setHasId] = useState(true);
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
     try {
       const storedId = await getUserID();
-      console.log(storedId);
       const storedKey = await getApiKey();
 
       if (!storedId) {
@@ -29,21 +29,24 @@ export default function Home() {
       
       const data = await response.json();
       setUser(data);
+      setHasId(true);
     } catch (error) {
       console.error("Fetch error:", error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  useEffect(() => {
-    fetchUser();
-  }, []); 
+  useFocusEffect(
+    useCallback(() => {
+      fetchUser();
+    }, [])
+  );
 
   const renderValue = (value: any, suffix: string = "") => {
     if (!hasId) return "No User ID";
-    if (loading) return "...";
-    return `${value}${suffix}`;
+    if (loading && !user) return "...";
+    return `${value ?? 0}${suffix}`;
   };
 
   return (
@@ -54,7 +57,6 @@ export default function Home() {
     >
       <Text className="text-3xl text-white bg-[#313244] py-2 px-10 rounded-[10px]" style={{ fontFamily: "Jua_400Regular" }}>Kitchen</Text>
       
-      {/* Banner Section */}
       <View className="py-11 px-12">
         <View className="bg-[#7B4942] rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-16 px-9">
           <Text className="text-2xl text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>Hack club X Open Sauce</Text>
@@ -67,14 +69,14 @@ export default function Home() {
           <View className="bg-[#313244] rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-8 px-6 gap-6 w-[176px] min-h-[102px]">
             <Text className="text-[16px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>Your Cookies</Text>
             <Text className="text-[14px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>
-              {renderValue(user?.cookies || 0, " 🍪")}
+              {renderValue(user?.cookies, " 🍪")}
             </Text>
           </View>
 
           <View className="bg-[#313244] rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-8 px-6 gap-6 w-[176px] min-h-[102px]">
             <Text className="text-[16px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>Achievements</Text>
             <Text className="text-[14px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>
-              {renderValue(user?.achievements?.length || 0, " 🏆")}
+              {renderValue(user?.achievements?.length, " 🏆")}
             </Text>
           </View>
         </View>

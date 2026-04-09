@@ -146,25 +146,25 @@ export default function Explore() {
             {activeTab === 'devlogs' && devlogs.map((log, index) => (
               <ExplorePageProjectDevlogCard 
                 key={log.id || index} 
-                username={log.user?.name || "Member"}
+                username={log.user_display_name || "Member"}
                 time={new Date(log.created_at).toLocaleDateString()}
                 timeLogged={`${log.total_hours}h`} 
                 description={log.body} 
-                project={log.title || "Project"}
-                id={log.id}
+                project={log.project_title || "Project"}
+                id={log.project_id}
               />
             ))}
 
             {activeTab === 'projects' && projects.map((project) => (
               <View key={project.id} className="bg-[#313244] p-5 rounded-2xl border border-white/10">
-                <View className="flex-row justify-between items-center mb-2">
+                <View className="flex-col gap-2 mb-2">
                    <TouchableOpacity onPress={() => router.push({ pathname: `/project/${project.id}` as any })}><Text className="text-[#ff8c00] text-xl" style={{ fontFamily: "Jua_400Regular" }}>{project.title}</Text></TouchableOpacity>
                    <View className="bg-[#ff8c00]/20 px-2 py-1 rounded-md">
                       <Text className="text-[#ff8c00] text-xs uppercase font-bold">{project.ship_status}</Text>
                    </View>
                 </View>
                 <Text className="text-gray-300 text-sm leading-5">{project.description}</Text>
-                <Text className="text-gray-500 text-[10px] mt-4">Shipped on {new Date(project.created_at).toLocaleDateString()}</Text>
+                <Text className="text-gray-500 text-[10px] mt-4">Created on {new Date(project.created_at).toLocaleDateString()}</Text>
               </View>
             ))}
 

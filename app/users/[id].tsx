@@ -69,7 +69,6 @@ export default function UserProfilePage() {
     <ImageBackground source={require("@/assets/BG.webp")} className="flex-1" resizeMode="cover">
       <ScrollView className="flex-1" contentContainerStyle={{ paddingTop: 80, paddingHorizontal: 25, paddingBottom: 40 }}>
         
-        {/* --- PROFILE HEADER CARD --- */}
         <View className="items-center mb-10 bg-[#d7b592] p-6 rounded-[24px] shadow-xl border border-white/20">
           <View className="w-24 h-24 rounded-full border-4 border-[#ff8c00] overflow-hidden mb-4 bg-[#313244]">
              <Image 
@@ -107,9 +106,8 @@ export default function UserProfilePage() {
           </View>
         </View>
 
-        {/* --- PROJECTS SECTION --- */}
         <Text className="text-2xl text-white mb-5" style={{ fontFamily: "Jua_400Regular" }}>
-            The Lab ({userProjects.length} Ships)
+            The Lab ({userProjects.length} Projects)
         </Text>
 
         {userProjects.length > 0 ? (

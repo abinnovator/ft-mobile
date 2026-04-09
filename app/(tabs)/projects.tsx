@@ -83,6 +83,7 @@ export default function Projects() {
                 <PersonalProjectCard 
                   title={project.title} 
                   description={project.description} 
+                  id={project.id}
                   image={finalImageUrl} 
                   key={project.id} 
                   onPress={() => router.push({ pathname: "/NewProject", params: { id: project.id } })}
