@@ -10,6 +10,7 @@ export default function Home() {
   const fetchUser = async () => {
     try {
       const storedId = await getUserID();
+      console.log(storedId);
       const storedKey = await getApiKey();
 
       if (!storedId) {

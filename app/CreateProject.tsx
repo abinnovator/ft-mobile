@@ -1,5 +1,6 @@
 import { getApiKey } from "@/lib/authStore";
 import * as Haptics from 'expo-haptics';
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
     ActivityIndicator,
@@ -14,6 +15,8 @@ import {
 
 const NewProject = () => {
     const [isSaving, setIsSaving] = useState(false);
+      const router = useRouter();
+    
     
     // Form State based on your Schema
     const [form, setForm] = useState({
@@ -77,7 +80,7 @@ const NewProject = () => {
         >
             <View className="flex-1 items-center pt-20">
                 <Text className="text-3xl text-white bg-[#313244] py-2 px-10 rounded-[10px]" style={{ fontFamily: "Jua_400Regular" }}>
-                    New Ship
+                    New Project
                 </Text>
                 
                 <ScrollView 
@@ -149,6 +152,19 @@ const NewProject = () => {
                         ) : (
                             <Text className="text-white text-[20px]" style={{ fontFamily: "Jua_400Regular" }}>
                                 Ship to Flavortown 🚀
+                            </Text>
+                        )}
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        onPress={() => router.back()}
+                        disabled={isSaving}
+                        className={`mt-5 py-4 rounded-[15px] items-center ${isSaving ? 'bg-gray-500' : 'bg-red-600'}`}
+                    >
+                        {isSaving ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <Text className="text-white text-[20px]" style={{ fontFamily: "Jua_400Regular" }}>
+                                Cancel
                             </Text>
                         )}
                     </TouchableOpacity>

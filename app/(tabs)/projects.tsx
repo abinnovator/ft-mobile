@@ -1,13 +1,15 @@
 import NoKey from "@/components/NoKey"; // Make sure this is exported correctly
 import PersonalProjectCard from "@/components/PersonalProjectCard";
 import { getApiKey, getUserID } from "@/lib/authStore";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, ImageBackground, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, ImageBackground, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function Projects() {
   const [hasAuth, setHasAuth] = useState(false);
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
+  const router = useRouter();
   const fetchRandomDevlogs = async () => {
       try {
         const response = await fetch(`http://ftpdb.jam06452.uk/api/user_projects/${await getUserID()}`); 
@@ -77,7 +79,7 @@ export default function Projects() {
           {projects.map((project)=> (
             <PersonalProjectCard title={project.title} description={project.description} image={project.banner_url} key={project.id} />
           ))}
-          <View></View>
+          <TouchableOpacity onPress={() => router.push('/CreateProject')}  className="py-3 px-3 rounded-[20px] bg-[#303143]"><Text className="text-white text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>+ Create Project</Text></TouchableOpacity>
         </ScrollView>
 
       </View>

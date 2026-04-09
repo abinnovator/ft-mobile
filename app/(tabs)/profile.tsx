@@ -44,6 +44,42 @@ const Profile = () => {
             setIsSaving(false);
         }
     };
+    const [user, setUser] = useState(null);
+  const [hasId, setHasId] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  const fetchUser = async () => {
+    try {
+      const storedId = await getUserID();
+      console.log(storedId);
+      const storedKey = await getApiKey();
+
+      if (!storedId) {
+        setHasId(false);
+        setLoading(false);
+        return;
+      }
+
+      const activeKey = storedKey || process.env.BASE_FT_API || "";
+
+      const response = await fetch(`https://flavortown.hackclub.com/api/v1/users/${storedId}`, {
+        headers: {
+          "Authorization": `Bearer ${activeKey}`
+        }
+      }); 
+      
+      const data = await response.json();
+      setUser(data);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchUser();
+  }, []); 
 
     return (
         <ImageBackground 
@@ -53,7 +89,7 @@ const Profile = () => {
         >
             <View className="flex-1 items-center pt-20">
                 <Text className="text-3xl text-white bg-[#313244] py-2 px-10 rounded-[10px]" style={{ fontFamily: "Jua_400Regular" }}>
-                    Your Settings
+                    Your Profile
                 </Text>
                 
                 <ScrollView 
@@ -61,6 +97,7 @@ const Profile = () => {
                     contentContainerStyle={{ paddingTop: 80, paddingBottom: 40, gap: 25 }}
                     showsVerticalScrollIndicator={false}
                 >
+                    {/* <Image source={user? user.avatar : require("@/assets/profile.png")} className="w-[289px] h-[157px] rounded-[10px]" /> */}
                     {/* API Key Field */}
                     <View className="bg-[#303143] rounded-[20px] p-5 flex-row items-center gap-4">
                         <Text className="text-white text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>API Key:</Text>
