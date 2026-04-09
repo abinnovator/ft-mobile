@@ -1,26 +1,34 @@
 name: Build Android APK
-on: [push]
+on:
+  workflow_dispatch: # Allows you to run it manually from the Actions tab
+  push:
+    branches:
+      - main # Or whatever your main branch is called
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: 🏗 Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: 🟢 Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'npm'
 
-      - name: Setup Expo
+      - name: 🛠 Setup Expo & EAS
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
           eas-cache: true
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install Dependencies
-        run: npm install
+      - name: 📦 Install Dependencies
+        run: |
+          npm install
+          npm install -g eas-cli
 
-      - name: Build APK
+      - name: 🚀 Build APK Locally on GitHub
         run: eas build -p android --profile preview --local
