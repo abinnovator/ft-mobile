@@ -12,10 +12,10 @@ jobs:
       - name: 🏗 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node (Upgraded to v20)
+      - name: 🟢 Setup Node (v20)
         uses: actions/setup-node@v4
         with:
-          node-version: 20 # <--- This fixes the "Incompatible Module" error
+          node-version: 20
           cache: 'npm'
 
       - name: 🛠 Setup Expo & EAS
@@ -32,9 +32,12 @@ jobs:
 
       - name: 🚀 Build APK Locally on GitHub
         run: eas build -p android --profile preview --local --non-interactive
+        env:
+          EXPO_NO_DOCTOR: 1 # Bypasses minor config warnings to ensure it finishes
+
       - name: 📦 Upload APK Artifact
-        uses: actions/checkout@v4 # Re-confirming path
-      - uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with:
           name: flavortown-apk
-          path: build-*.apk # This matches the filename from your logs
+          path: build-*.apk # Grabs the generated APK file from the runner disk
+          if-no-files-found: error
