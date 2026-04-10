@@ -2,7 +2,7 @@ import ExplorePageProjectDevlogCard from "@/components/ExplorePageProjectDevlogC
 import { getApiKey } from "@/lib/authStore";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, ImageBackground, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, ImageBackground, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 interface Project {
   id: number;
@@ -44,10 +44,26 @@ export default function Explore() {
 
   const fetchRandomDevlogs = async () => {
     try {
-      const response = await fetch('http://ftpdb.jam06452.uk/api/random_devlogs');
+
+      const response = await fetch('https://ftpdb.jam06452.uk/api/random_devlogs', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server returned ${response.status}`);
+      }
+
       const data = await response.json();
       setDevlogs(data);
-    } catch (e) { console.error("Devlog error:", e); }
+    } catch (e: any) { 
+      console.error("Devlog error:", e);
+      // 3. This alert is your "Scouting Report" in production
+      Alert.alert("Devlog Fetch Error", e.message || "Unknown Network Error");
+    }
   };
 
   const fetchProjects = async (page: number) => {
