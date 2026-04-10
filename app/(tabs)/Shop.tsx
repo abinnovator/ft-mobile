@@ -85,7 +85,6 @@ export default function ShopPage() {
           The Shop
         </Text>
 
-        {/* 2. Search Input */}
         <TextInput
           placeholder="Search items..."
           placeholderTextColor="#9ca3af"

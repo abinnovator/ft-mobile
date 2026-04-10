@@ -2,7 +2,7 @@ import ExplorePageProjectDevlogCard from "@/components/ExplorePageProjectDevlogC
 import { getApiKey } from "@/lib/authStore";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, ImageBackground, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ImageBackground, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function Explore() {
   const [activeTab, setActiveTab] = useState<'projects' | 'devlogs' | 'users'>('devlogs');
@@ -12,13 +12,9 @@ export default function Explore() {
   const router = useRouter();
 
   const [devlogs, setDevlogs] = useState<any[]>([]);
-  const [devlogPage, setDevlogPage] = useState(1);
-  const [hasMoreDevlogs, setHasMoreDevlogs] = useState(true);
-
   const [projects, setProjects] = useState<any[]>([]);
   const [projectPage, setProjectPage] = useState(1);
   const [hasMoreProjects, setHasMoreProjects] = useState(true);
-
   const [users, setUsers] = useState<any[]>([]);
   const [userPage, setUserPage] = useState(1);
   const [hasMoreUsers, setHasMoreUsers] = useState(true);
@@ -29,114 +25,83 @@ export default function Explore() {
     return { "Authorization": `Bearer ${activeKey}`, "Accept": "application/json" };
   };
 
-  const fetchData = async (type: string, page: number, query: string = "") => {
+
+  const fetchDevlogs = async (query: string = "") => {
+    try {
+      const response = await fetch(`https://ftpdb.jam06452.uk/api/random_devlogs`);
+      const data = await response.json();
+      
+      const filtered = query 
+        ? data.filter((d: any) => d.body.toLowerCase().includes(query.toLowerCase()) || d.user_display_name.toLowerCase().includes(query.toLowerCase()))
+        : data;
+
+      setDevlogs(filtered);
+    } catch (e) { console.error("Devlog fetch error:", e); }
+    finally { setLoading(false); setIsFetchingMore(false); }
+  };
+
+  const fetchProjects = async (page: number, query: string = "") => {
     try {
       const headers = await getHeaders();
-      let url = "";
-      
-      if (type === 'devlogs') {
-        url = `https://flavortown.hackclub.com/api/v1/devlogs?page=${page}&limit=10${query ? `&query=${query}` : ""}`;
-      } else if (type === 'projects') {
-        url = `https://flavortown.hackclub.com/api/v1/projects?page=${page}&limit=10${query ? `&query=${query}` : ""}`;
-      } else {
-        url = `https://flavortown.hackclub.com/api/v1/users?page=${page}&limit=20${query ? `&query=${query}` : ""}`;
-      }
-
+      const url = `https://flavortown.hackclub.com/api/v1/projects?page=${page}&limit=15${query ? `&query=${query}` : ""}`;
       const response = await fetch(url, { headers });
       const data = await response.json();
 
-      if (type === 'devlogs') {
-        const newLogs = data.devlogs || [];
-        setDevlogs(prev => page === 1 ? newLogs : [...prev, ...newLogs]);
-        setHasMoreDevlogs(data.pagination?.next_page !== null);
-      } else if (type === 'projects') {
-        const newProjects = data.projects || [];
-        setProjects(prev => page === 1 ? newProjects : [...prev, ...newProjects]);
-        setHasMoreProjects(data.pagination?.next_page !== null);
-      } else {
-        const newUsers = data.users || [];
-        setUsers(prev => page === 1 ? newUsers : [...prev, ...newUsers]);
-        setHasMoreUsers(data.pagination?.next_page !== null);
-      }
-    } catch (e: any) {
-      console.error(`${type} fetch error:`, e);
-    } finally {
-      setLoading(false);
-      setIsFetchingMore(false);
-    }
+      setProjects(prev => page === 1 ? (data.projects || []) : [...prev, ...(data.projects || [])]);
+      setHasMoreProjects(data.pagination?.next_page !== null);
+    } catch (e) { console.error("Project fetch error:", e); }
+    finally { setLoading(false); setIsFetchingMore(false); }
   };
+
+  const fetchUsers = async (page: number, query: string = "") => {
+    try {
+      const headers = await getHeaders();
+      const url = `https://flavortown.hackclub.com/api/v1/users?page=${page}&limit=20${query ? `&query=${query}` : ""}`;
+      const response = await fetch(url, { headers });
+      const data = await response.json();
+
+      setUsers(prev => page === 1 ? (data.users || []) : [...prev, ...(data.users || [])]);
+      setHasMoreUsers(data.pagination?.next_page !== null);
+    } catch (e) { console.error("User fetch error:", e); }
+    finally { setLoading(false); setIsFetchingMore(false); }
+  };
+
 
   useEffect(() => {
     setLoading(true);
     const delayDebounceFn = setTimeout(() => {
-      setDevlogPage(1);
-      setProjectPage(1);
-      setUserPage(1);
-      fetchData(activeTab, 1, searchQuery);
+      if (activeTab === 'devlogs') fetchDevlogs(searchQuery);
+      if (activeTab === 'projects') { setProjectPage(1); fetchProjects(1, searchQuery); }
+      if (activeTab === 'users') { setUserPage(1); fetchUsers(1, searchQuery); }
     }, 500);
-
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, activeTab]);
 
-  const loadMore = () => {
-    if (isFetchingMore || loading) return;
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 100;
 
-    if (activeTab === 'devlogs' && hasMoreDevlogs) {
-      setIsFetchingMore(true);
-      fetchData('devlogs', devlogPage + 1, searchQuery);
-      setDevlogPage(prev => prev + 1);
-    } else if (activeTab === 'projects' && hasMoreProjects) {
-      setIsFetchingMore(true);
-      fetchData('projects', projectPage + 1, searchQuery);
-      setProjectPage(prev => prev + 1);
-    } else if (activeTab === 'users' && hasMoreUsers) {
-      setIsFetchingMore(true);
-      fetchData('users', userPage + 1, searchQuery);
-      setUserPage(prev => prev + 1);
+    if (isCloseToBottom && !isFetchingMore && !loading) {
+      if (activeTab === 'projects' && hasMoreProjects) {
+        setIsFetchingMore(true);
+        const next = projectPage + 1;
+        fetchProjects(next, searchQuery);
+        setProjectPage(next);
+      } else if (activeTab === 'users' && hasMoreUsers) {
+        setIsFetchingMore(true);
+        const next = userPage + 1;
+        fetchUsers(next, searchQuery);
+        setUserPage(next);
+      }
     }
-  };
-
-  const renderItem = ({ item }: { item: any }) => {
-    if (activeTab === 'devlogs') {
-      return (
-        <ExplorePageProjectDevlogCard 
-          username={item.user_display_name || "Member"}
-          time={new Date(item.created_at).toLocaleDateString()}
-          timeLogged={`${(item.duration_seconds / 3600).toFixed(1)}h`} 
-          description={item.body} 
-          project={item.project_title || "Project"}
-          id={item.project_id}
-        />
-      );
-    }
-    if (activeTab === 'projects') {
-      return (
-        <View className="bg-card p-5 rounded-2xl border border-white/10 mb-4">
-          <TouchableOpacity onPress={() => router.push({ pathname: `/project/${item.id}` as any })}>
-            <Text className="text-white text-xl" style={{ fontFamily: "Jua_400Regular" }}>{item.title}</Text>
-          </TouchableOpacity>
-          <View className="bg-accent/20 self-start px-2 py-1 rounded-md mt-1">
-            <Text className="text-white text-xs uppercase font-bold">{item.ship_status}</Text>
-          </View>
-          <Text className="text-gray-300 text-sm mt-2">{item.description}</Text>
-        </View>
-      );
-    }
-    return (
-      <View className="bg-card p-4 rounded-xl flex-row justify-between items-center border border-white/5 mb-4">
-        <TouchableOpacity onPress={() => router.push(`/users/${item.id}` as any)}>
-          <Text className="text-accent text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>{item.display_name || "Hacker"}</Text>
-          <Text className="text-gray-500 text-xs">@{item.slack_id}</Text>
-        </TouchableOpacity>
-        <Text className="text-white text-lg" style={{ fontFamily: "Jua_400Regular" }}>{item.cookies ?? 0} 🍪</Text>
-      </View>
-    );
   };
 
   return (
     <ImageBackground source={require("@/assets/BG.webp")} className="flex-1" resizeMode="cover">
       <View className="flex-1 items-center pt-20">
-        <Text className="text-3xl text-white bg-card py-2 px-10 rounded-[10px] mb-4" style={{ fontFamily: "Jua_400Regular" }}>Explore</Text>
+        <Text className="text-3xl text-white bg-card py-2 px-10 rounded-[10px] mb-4" style={{ fontFamily: "Jua_400Regular" }}>
+          Explore
+        </Text>
 
         <TextInput
           placeholder="Search FlavorTown..."
@@ -151,27 +116,65 @@ export default function Explore() {
           {['projects', 'devlogs', 'users'].map((tab) => (
             <TouchableOpacity 
               key={tab}
-              onPress={() => { setActiveTab(tab as any); setLoading(true); }}
+              onPress={() => setActiveTab(tab as any)}
               className={`flex-1 py-2 rounded-[8px] ${activeTab === tab ? 'bg-accent' : ''}`}
             >
-              <Text className={`text-center capitalize ${activeTab === tab ? 'text-white' : 'text-gray-400'}`} style={{ fontFamily: "Jua_400Regular" }}>{tab}</Text>
+              <Text className={`text-center capitalize ${activeTab === tab ? 'text-white' : 'text-gray-400'}`} style={{ fontFamily: "Jua_400Regular" }}>
+                {tab}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#ec8b34" />
+          <ActivityIndicator size="large" color="#ec8b34" className="mt-10" />
         ) : (
-          <FlatList
-            data={activeTab === 'devlogs' ? devlogs : activeTab === 'projects' ? projects : users}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-            onEndReached={loadMore}
-            onEndReachedThreshold={0.5}
-            contentContainerStyle={{ paddingHorizontal: 40, paddingBottom: 100 }}
+          <ScrollView 
             className="w-full"
-            ListFooterComponent={isFetchingMore ? <ActivityIndicator color="#ec8b34" className="py-4" /> : null}
-          />
+            contentContainerStyle={{ paddingHorizontal: 40, paddingBottom: 100 }}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+          >
+            {activeTab === 'devlogs' && (
+              <View className="flex flex-col gap-3">
+                {devlogs.map((item, index) => (
+                  <ExplorePageProjectDevlogCard 
+                    key={`log-${item.id}-${index}`}
+                    username={item.user_display_name || "Member"}
+                    time={new Date(item.created_at).toLocaleDateString()}
+                    timeLogged={`${item.total_hours}h`} 
+                    description={item.body} 
+                    project={item.project_title || "Project"}
+                    id={item.project_id}
+                  />
+                ))}
+              </View>
+            )}
+
+            {activeTab === 'projects' && projects.map((item, index) => (
+              <View key={`proj-${item.id}-${index}`} className="bg-card p-5 rounded-2xl border border-white/10 mb-4">
+                <TouchableOpacity onPress={() => router.push({ pathname: `/project/${item.id}` as any })}>
+                  <Text className="text-white text-xl" style={{ fontFamily: "Jua_400Regular" }}>{item.title}</Text>
+                </TouchableOpacity>
+                <View className="bg-accent/20 self-start px-2 py-1 rounded-md mt-1">
+                  <Text className="text-white text-xs uppercase font-bold">{item.ship_status}</Text>
+                </View>
+                <Text className="text-gray-300 text-sm mt-2">{item.description}</Text>
+              </View>
+            ))}
+
+            {activeTab === 'users' && users.map((item, index) => (
+              <View key={`user-${item.id}-${index}`} className="bg-card p-4 rounded-xl flex-row justify-between items-center border border-white/5 mb-4">
+                <TouchableOpacity onPress={() => router.push(`/users/${item.id}` as any)}>
+                  <Text className="text-accent text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>{item.display_name || "Hacker"}</Text>
+                  <Text className="text-gray-500 text-xs">@{item.slack_id}</Text>
+                </TouchableOpacity>
+                <Text className="text-white text-lg" style={{ fontFamily: "Jua_400Regular" }}>{item.cookies ?? 0} 🍪</Text>
+              </View>
+            ))}
+
+            {isFetchingMore && <ActivityIndicator color="#ec8b34" className="py-4" />}
+          </ScrollView>
         )}
       </View>
     </ImageBackground>
