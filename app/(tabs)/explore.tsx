@@ -115,11 +115,11 @@ export default function Explore() {
   return (
     <ImageBackground source={require("@/assets/BG.webp")} className="flex-1" resizeMode="cover">
       <View className="flex-1 items-center pt-20">
-        <Text className="text-3xl text-white bg-[#313244] py-2 px-10 rounded-[10px] mb-6" style={{ fontFamily: "Jua_400Regular" }}>
+        <Text className="text-3xl text-white bg-card py-2 px-10 rounded-[10px] mb-6" style={{ fontFamily: "Jua_400Regular" }}>
           Explore
         </Text>
 
-        <View className="flex-row bg-[#313244] w-[85%] rounded-[10px] p-1 mb-6">
+        <View className="flex-row bg-card w-[85%] rounded-[10px] p-1 mb-6">
           {['projects', 'devlogs', 'users'].map((tab) => (
             <TouchableOpacity 
               key={tab}
@@ -156,11 +156,11 @@ export default function Explore() {
             ))}
 
             {activeTab === 'projects' && projects.map((project) => (
-              <View key={project.id} className="bg-[#313244] p-5 rounded-2xl border border-white/10">
+              <View key={project.id} className="bg-card p-5 rounded-2xl border border-white/10">
                 <View className="flex-col gap-2 mb-2">
-                   <TouchableOpacity onPress={() => router.push({ pathname: `/project/${project.id}` as any })}><Text className="text-[#ff8c00] text-xl" style={{ fontFamily: "Jua_400Regular" }}>{project.title}</Text></TouchableOpacity>
+                   <TouchableOpacity onPress={() => router.push({ pathname: `/project/${project.id}` as any })}><Text className="text-white text-xl" style={{ fontFamily: "Jua_400Regular" }}>{project.title}</Text></TouchableOpacity>
                    <View className="bg-[#ff8c00]/20 px-2 py-1 rounded-md">
-                      <Text className="text-[#ff8c00] text-xs uppercase font-bold">{project.ship_status}</Text>
+                      <Text className="text-white text-xs uppercase font-bold">{project.ship_status}</Text>
                    </View>
                 </View>
                 <Text className="text-gray-300 text-sm leading-5">{project.description}</Text>
@@ -169,10 +169,10 @@ export default function Explore() {
             ))}
 
             {activeTab === 'users' && users.map((u) => (
-              <View key={u.id} className="bg-[#313244] p-4 rounded-xl flex-row justify-between items-center border border-white/5">
+              <View key={u.id} className="bg-card p-4 rounded-xl flex-row justify-between items-center border border-white/5">
                 <View>
                   <TouchableOpacity 
-                      onPress={() => router.push(`/users/${u.id}`)}
+                      onPress={() => router.push(`/users/${u.id}` as any)}
                       className="text-white text-lg"
                   >
                       <Text className="text-red-500 text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>

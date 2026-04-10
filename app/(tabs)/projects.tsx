@@ -62,7 +62,7 @@ export default function Projects() {
       resizeMode="cover"
     >
       <View className="flex-1 items-center pt-20">
-        <Text className="text-3xl text-white bg-[#313244] py-2 px-10 rounded-[10px]" style={{ fontFamily: "Jua_400Regular" }}>
+        <Text className="text-3xl text-white bg-card py-2 px-10 rounded-[10px]" style={{ fontFamily: "Jua_400Regular" }}>
           Your Projects
         </Text>
         
@@ -98,7 +98,7 @@ export default function Projects() {
 
           <TouchableOpacity 
             onPress={() => router.push('/CreateProject')} 
-            className="py-4 px-3 rounded-[20px] bg-[#303143] items-center border border-white/10"
+            className="py-4 px-3 rounded-[20px] bg-card items-center border border-white/10"
           >
             <Text className="text-white text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>
               + Create Project

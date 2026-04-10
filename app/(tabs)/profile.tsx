@@ -88,7 +88,7 @@ const Profile = () => {
             resizeMode="cover"
         >
             <View className="flex-1 items-center pt-20">
-                <Text className="text-3xl text-white bg-[#313244] py-2 px-10 rounded-[10px]" style={{ fontFamily: "Jua_400Regular" }}>
+                <Text className="text-3xl text-white bg-card py-2 px-10 rounded-[10px]" style={{ fontFamily: "Jua_400Regular" }}>
                     Your Profile
                 </Text>
                 
@@ -98,7 +98,7 @@ const Profile = () => {
                     showsVerticalScrollIndicator={false}
                 >
 
-                    <View className="bg-[#303143] rounded-[20px] p-5 flex-row items-center gap-4">
+                    <View className="bg-card rounded-[20px] p-5 flex-row items-center gap-4">
                         <Text className="text-white text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>API Key:</Text>
                         <TextInput
                             editable
@@ -111,7 +111,7 @@ const Profile = () => {
                         />
                     </View>
 
-                    <View className="bg-[#303143] rounded-[20px] p-5 flex-row items-center gap-4">
+                    <View className="bg-card rounded-[20px] p-5 flex-row items-center gap-4">
                         <Text className="text-white text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>User ID:</Text>
                         <TextInput
                             editable

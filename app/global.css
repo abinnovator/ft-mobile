@@ -1,3 +1,53 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-background: #e7d5b1;
+    --color-card: #7b4942;
+    --color-text: #ffffff;
+    --color-accent: #ec8b34;
+    --color-nav: #e7d5b1
+  }
+
+  .dark {
+    --color-background: #1e1e2e;
+    --color-card: #313244;
+    --color-text: #cdd6f4;
+    --color-accent: #fab387;
+    --color-nav: #313244;
+  }
+  
+  .vanilla {
+    --color-background: #e7d5b1;
+    --color-card: #7b4942;
+    --color-text: #ffffff;
+    --color-accent: #ec8b34;
+    --color-nav: #e7d5b1
+  }
+  .catpuccin {
+    --color-bg: #1f1e2e;
+    --color-card: #313244;
+    --color-text: #bdcff0;
+    --color-accent: #cca5f6;
+    --color-nav: #1f1e2e
+  }
+  .ocean {
+    --color-background: #0a1527;
+    --color-card: #102a4b;
+    --color-text: #e9f5ff;
+    --color-accent: #24d2eb;
+    --color-nav: #0a1527;
+  }
+  .overcooked {
+    --color-background: #190f0e;
+    --color-card: #4a1819;
+    --color-text: #a8b8c9;
+    --color-accent: #ec8936;
+    --color-nav: #4a1819;
+  }
+}

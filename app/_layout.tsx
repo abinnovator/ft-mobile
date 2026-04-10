@@ -1,7 +1,8 @@
+import { Jua_400Regular, useFonts } from "@expo-google-fonts/jua";
 import { Stack } from "expo-router";
-import { useFonts, Jua_400Regular } from "@expo-google-fonts/jua";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { View } from "react-native";
 import "./global.css";
 
 SplashScreen.preventAutoHideAsync();
@@ -10,6 +11,8 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Jua_400Regular,
   });
+
+  const [theme, setTheme] = useState("vanilla");
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -21,5 +24,9 @@ export default function RootLayout() {
     return null;
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <View className={`flex-1 ${theme}`}>
+      <Stack screenOptions={{ headerShown: false }} />
+    </View>
+  );
 }

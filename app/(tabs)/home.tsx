@@ -55,10 +55,10 @@ export default function Home() {
       className="flex flex-col items-center pt-20 text-white h-screen w-screen"
       resizeMode="cover"
     >
-      <Text className="text-3xl text-white bg-[#313244] py-2 px-10 rounded-[10px]" style={{ fontFamily: "Jua_400Regular" }}>Kitchen</Text>
+      <Text className="text-3xl text-white bg-card py-2 px-10 rounded-[10px]" style={{ fontFamily: "Jua_400Regular" }}>Kitchen</Text>
       
       <View className="py-11 px-12">
-        <View className="bg-[#7B4942] rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-16 px-9">
+        <View className="bg-card rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-16 px-9">
           <Text className="text-2xl text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>Hack club X Open Sauce</Text>
           <Text className="text-lg text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>New items available</Text>
         </View>
@@ -66,14 +66,14 @@ export default function Home() {
 
       <View className="gap-5 flex flex-col">
         <View className="flex flex-row gap-2 px-6">
-          <View className="bg-[#313244] rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-8 px-6 gap-6 w-[176px] min-h-[102px]">
+          <View className="bg-card rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-8 px-6 gap-6 w-[176px] min-h-[102px]">
             <Text className="text-[16px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>Your Cookies</Text>
             <Text className="text-[14px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>
               {renderValue(user?.cookies, " 🍪")}
             </Text>
           </View>
 
-          <View className="bg-[#313244] rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-8 px-6 gap-6 w-[176px] min-h-[102px]">
+          <View className="bg-card rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-8 px-6 gap-6 w-[176px] min-h-[102px]">
             <Text className="text-[16px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>Achievements</Text>
             <Text className="text-[14px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>
               {renderValue(user?.achievements?.length, " 🏆")}
@@ -82,14 +82,14 @@ export default function Home() {
         </View>
 
         <View className="flex flex-row gap-2 px-6">
-          <View className="bg-[#313244] rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-8 px-6 gap-6 w-[176px] min-h-[102px]">
+          <View className="bg-card rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-8 px-6 gap-6 w-[176px] min-h-[102px]">
             <Text className="text-[16px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>Time today</Text>
             <Text className="text-[14px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>
               {renderValue((user?.devlog_seconds_today / 3600).toFixed(2), " hrs")}
             </Text>
           </View>
 
-          <View className="bg-[#313244] rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-8 px-6 gap-6 w-[176px] min-h-[102px]">
+          <View className="bg-card rounded-lg flex flex-col justify-center text-center text-white pt-7 pb-8 px-6 gap-6 w-[176px] min-h-[102px]">
             <Text className="text-[16px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>Total Time</Text>
             <Text className="text-[14px] text-white text-center" style={{ fontFamily: "Jua_400Regular" }}>
               {renderValue((user?.devlog_seconds_total / 3600).toFixed(2), " hrs")}

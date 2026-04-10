@@ -28,7 +28,7 @@ export default function ProjectPage() {
       const headers = { "Authorization": `Bearer ${key}` };
 
       const projectUrl = `https://flavortown.hackclub.com/api/v1/projects/${id}`;
-      const devlogsUrl = `https://flavortown.hackclub.com/api/v1/projects/${id}/devlogs?page=1&limit=20`;
+      const devlogsUrl = `https://flavortown.hackclub.com/api/v1/projects/${id}/devlogs?page=1&limit=40`;
 
       const [projectRes, devlogsRes] = await Promise.all([
         fetch(projectUrl, { headers }),
@@ -85,9 +85,10 @@ export default function ProjectPage() {
             </View>
           </View>
 
-          <View className="bg-[#313244] p-5 rounded-2xl mt-6 border border-white/10">
+          <View className="bg-card p-5 rounded-2xl mt-6 border border-white/10">
             <Text className="text-gray-300 text-lg leading-6">{project?.description}</Text>
           </View>
+
 
           <View className="flex-row gap-4 mt-8">
             {project?.repo_url && (
@@ -101,7 +102,7 @@ export default function ProjectPage() {
             {project?.demo_url && (
               <TouchableOpacity 
                 onPress={() => Linking.openURL(project.demo_url)}
-                className="flex-1 bg-blue-600 py-4 rounded-2xl items-center"
+                className="flex-1 bg-accent py-4 rounded-2xl items-center"
               >
                 <Text className="text-white font-bold">Live Demo</Text>
               </TouchableOpacity>

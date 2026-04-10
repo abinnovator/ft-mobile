@@ -7,6 +7,13 @@ module.exports = {
       fontFamily: {
         jua: ["Jua_400Regular"],
       },
+      colors: {
+        background: "var(--color-bg)",
+        card: "var(--color-card)",
+        text: "var(--color-text)",
+        accent: "var(--color-accent)",
+        nav: "var(--nav-bg)",
+      },
     },
   },
   plugins: [],

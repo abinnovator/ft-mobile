@@ -82,14 +82,13 @@ export default function UserProfilePage() {
           </Text>
           <Text className="text-gray-700 text-lg">@{user?.slack_id}</Text>
           
-          <View className="bg-[#313244] px-6 py-2 rounded-full mt-4 flex-row items-center">
+          <View className="bg-card px-6 py-2 rounded-full mt-4 flex-row items-center">
             <Text className="text-[#ff8c00] text-xl mr-2" style={{ fontFamily: "Jua_400Regular" }}>
                 {user?.cookies ?? 0}
             </Text>
             <Text className="text-white text-sm">Cookies Earned 🍪</Text>
           </View>
 
-          {/* --- STATS SECTION --- */}
           <View className="pt-6 w-full border-t border-white/30 mt-6 flex-row justify-around">
             <View className="items-center">
                 <Text className="text-white text-xs opacity-80 uppercase font-bold">Today</Text>
@@ -112,7 +111,7 @@ export default function UserProfilePage() {
 
         {userProjects.length > 0 ? (
           userProjects.map((project) => (
-            <View key={project.id} className="bg-[#313244] p-5 rounded-2xl border border-white/10 mb-4 shadow-sm">
+            <View key={project.id} className="bg-card p-5 rounded-2xl border border-white/10 mb-4 shadow-sm">
                 <Text className="text-[#ff8c00] text-xl mb-1" style={{ fontFamily: "Jua_400Regular" }}>
                     {project.title}
                 </Text>
