@@ -85,7 +85,7 @@ export default function ProjectPage() {
             </View>
           </View>
 
-          <View className="bg-card p-5 rounded-2xl mt-6 border border-white/10">
+          <View className="bg-card p-5 rounded-2xl mt-6 border border-white/10 flex flex-col gap-2">
             <Text className="text-gray-300 text-lg leading-6">{project?.description}</Text>
           </View>
 
