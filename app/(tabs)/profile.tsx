@@ -98,12 +98,12 @@ const Profile = () => {
                     showsVerticalScrollIndicator={false}
                 >
 
-                    <View className="bg-card rounded-[20px] p-5 flex-row items-center gap-4">
+                    <View className="bg-[#be4a53] rounded-[20px] p-5 flex-row items-center gap-4">
                         <Text className="text-white text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>API Key:</Text>
                         <TextInput
                             editable
                             placeholder="Paste Key Here"
-                            placeholderTextColor="#666"
+                            placeholderTextColor="#ffffff"
                             secureTextEntry={true}
                             onChangeText={setApiKey}
                             value={apiKey}
@@ -111,12 +111,12 @@ const Profile = () => {
                         />
                     </View>
 
-                    <View className="bg-card rounded-[20px] p-5 flex-row items-center gap-4">
+                    <View className="bg-[#be4a53] rounded-[20px] p-5 flex-row items-center gap-4">
                         <Text className="text-white text-[18px]" style={{ fontFamily: "Jua_400Regular" }}>User ID:</Text>
                         <TextInput
                             editable
                             placeholder="Enter User ID"
-                            placeholderTextColor="#666"
+                            placeholderTextColor="#ffffff"
                             onChangeText={setUserId}
                             value={userId}
                             className="text-white flex-1"
@@ -126,7 +126,7 @@ const Profile = () => {
                     <TouchableOpacity 
                         onPress={handleSave}
                         disabled={isSaving}
-                        className={`mt-5 py-4 rounded-[15px] items-center ${isSaving ? 'bg-gray-500' : 'bg-orange-500'}`}
+                        className={`mt-5 py-4 rounded-[15px] items-center ${isSaving ? 'bg-gray-500' : 'bg-[#af7b5b]'}`}
                     >
                         <Text className="text-white text-[20px]" style={{ fontFamily: "Jua_400Regular" }}>
                             {isSaving ? "Saving..." : "Save Settings"}

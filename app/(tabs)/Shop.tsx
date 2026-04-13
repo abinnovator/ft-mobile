@@ -1,4 +1,5 @@
 import { getApiKey } from "@/lib/authStore";
+import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,10 +13,21 @@ import {
   View
 } from "react-native";
 
+const REGIONS = [
+  { label: "India", value: "in" },
+  { label: "USA", value: "us" },
+  { label: "UK", value: "uk" },
+  { label: "Europe", value: "eu" },
+  { label: "Canada", value: "ca" },
+  { label: "Australia", value: "au" },
+  { label: "Global", value: "xx" },
+];
+
 export default function ShopPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("in");
 
   const fetchShopItems = async () => {
     try {
@@ -41,42 +53,52 @@ export default function ShopPage() {
         return item.buyable_by_self && matchesSearch;
       })
       .sort((a, b) => {
-        const priceA = a.ticket_cost?.in || a.ticket_cost?.base_cost || 0;
-        const priceB = b.ticket_cost?.in || b.ticket_cost?.base_cost || 0;
+        const priceA = a.ticket_cost?.[selectedRegion] || a.ticket_cost?.base_cost || 0;
+        const priceB = b.ticket_cost?.[selectedRegion] || b.ticket_cost?.base_cost || 0;
         return priceA - priceB;
       });
-  }, [items, searchQuery]);
+  }, [items, searchQuery, selectedRegion]);
 
-  const renderItem = ({ item }: { item: any }) => (
-    <View className="bg-card mb-4 rounded-3xl overflow-hidden border border-white/10">
-      <Image 
-        source={{ uri: item.image_url || "https://flavortown.hackclub.com/assets/default-prize.png" }} 
-        className="w-full h-48"
-        resizeMode="cover"
-      />
-      <View className="p-5">
-        <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-text text-xl flex-1" style={{ fontFamily: "Jua_400Regular" }}>
-            {item.name}
-          </Text>
-          <View className="bg-accent px-3 py-1 rounded-full">
-            <Text className="text-white font-bold">🍪 {item.ticket_cost?.in || item.ticket_cost?.base_cost}</Text>
+  const renderItem = ({ item }: { item: any }) => {
+    const isEnabledInRegion = item.enabled?.[`enabled_${selectedRegion}`];
+    const itemPrice = item.ticket_cost?.[selectedRegion] || item.ticket_cost?.base_cost;
+
+    return (
+      <View 
+        className={`bg-card mb-4 rounded-3xl overflow-hidden border border-white/10 ${!isEnabledInRegion ? 'opacity-50' : ''}`}
+      >
+        <Image 
+          source={{ uri: item.image_url || "https://flavortown.hackclub.com/assets/default-prize.png" }} 
+          className="w-full h-48"
+          resizeMode="cover"
+        />
+        <View className="p-5">
+          <View className="flex-row justify-between items-center mb-2">
+            <Text className="text-text text-xl flex-1" style={{ fontFamily: "Jua_400Regular" }}>
+              {item.name}
+            </Text>
+            <View className="bg-accent px-3 py-1 rounded-full">
+              <Text className="text-white font-bold">🍪 {itemPrice}</Text>
+            </View>
           </View>
+          
+          <Text className="text-gray-300 text-sm mb-4 leading-5" numberOfLines={3}>
+            {item.description}
+          </Text>
+          
+          <TouchableOpacity 
+            disabled={!isEnabledInRegion}
+            onPress={() => Linking.openURL(`https://flavortown.hackclub.com/shop/order?shop_item_id=${item.id}`)}
+            className={`py-3 rounded-xl items-center ${isEnabledInRegion ? 'bg-accent' : 'bg-gray-600'}`}
+          >
+            <Text className="text-white font-bold">
+              {isEnabledInRegion ? "View in Shop" : "Not Available in Region"}
+            </Text>
+          </TouchableOpacity>
         </View>
-        
-        <Text className="text-gray-300 text-sm mb-4 leading-5" numberOfLines={3}>
-          {item.description}
-        </Text>
-        
-        <TouchableOpacity 
-          onPress={() => Linking.openURL(`https://flavortown.hackclub.com/shop/order?shop_item_id=${item.id}`)}
-          className="py-3 rounded-xl items-center bg-accent"
-        >
-          <Text className="text-white font-bold">View in Shop</Text>
-        </TouchableOpacity>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <ImageBackground source={require("@/assets/BG.webp")} className="flex-1" resizeMode="cover">
@@ -84,6 +106,19 @@ export default function ShopPage() {
         <Text className="text-4xl text-black mb-6 text-center" style={{ fontFamily: "Jua_400Regular" }}>
           The Shop
         </Text>
+
+        <View className="bg-card rounded-2xl mb-4 border border-white/10 overflow-hidden">
+          <Picker
+            selectedValue={selectedRegion}
+            onValueChange={(itemValue) => setSelectedRegion(itemValue)}
+            style={{ color: '#fff' }}
+            dropdownIconColor="#ec8b34"
+          >
+            {REGIONS.map((r) => (
+              <Picker.Item key={r.value} label={r.label} value={r.value} />
+            ))}
+          </Picker>
+        </View>
 
         <TextInput
           placeholder="Search items..."
@@ -98,7 +133,7 @@ export default function ShopPage() {
           <ActivityIndicator size="large" color="#ec8b34" className="mt-20" />
         ) : (
           <FlatList
-            data={filteredAndSortedItems} // 3. Use the processed list
+            data={filteredAndSortedItems}
             renderItem={renderItem}
             keyExtractor={(item) => item.id.toString()}
             showsVerticalScrollIndicator={false}

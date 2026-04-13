@@ -49,7 +49,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="projects"
         options={{
-          title: "Projects",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="folder" size={size} color={color} />
           ),
@@ -58,7 +57,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profile",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
@@ -67,7 +65,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="achievement"
         options={{
-          title: "Achievement",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="trophy" size={size} color={color} />
           ),
@@ -76,7 +73,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="Shop"
         options={{
-          title: "Shop",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="cart" size={size} color={color} />
           ),
