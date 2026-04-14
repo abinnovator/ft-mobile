@@ -1,3 +1,13 @@
 # Flavortown Mobile
 
-This app is a mobile version of Flavortown, a ysws by hackclub. It allows users to view projects, devlogs, and more. I couldnt implement some features due to api limitations.
+Flavortown mobile is a port of flavortown to androif and IOS (coming soon).
+
+# Features
+- Check your stats. - See your cookies, achievements, time, projects.
+- Explore - Just like in ft you can explore through projects, devlogs and users!
+- Shop - see al shop items in your regiosn from the shop tab.
+
+# Tech Stack - 
+- React Native
+- Expo
+- Ft api
