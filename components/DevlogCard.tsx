@@ -7,8 +7,8 @@ const DevlogCard = ({description, time, timeLogged, username, project}: {descrip
         <View className="flex flex-row">
                     <View className="flex flex-col">
                         <Text className="text-white text-[16px]" style={{ fontFamily: "Jua_400Regular" }}>{username} worked on {project}</Text>
-                        <Text className="text-white text-[10px]" style={{ fontFamily: "Jua_400Regular" }}>{time} ago</Text>
-                        <Text className="text-white text-[10px]" style={{ fontFamily: "Jua_400Regular" }}>{timeLogged} time logged</Text>
+                        <Text className="text-white text-[6px]" style={{ fontFamily: "Jua_400Regular" }}>{time} ago</Text>
+                        <Text className="text-white text-[6px]" style={{ fontFamily: "Jua_400Regular" }}>{timeLogged} time logged</Text>
 
                     </View>
                 </View>

@@ -25,8 +25,7 @@ export default function Explore() {
     return { "Authorization": `Bearer ${activeKey}`, "Accept": "application/json" };
   };
 
-
-  const fetchDevlogs = async (query: string = "") => {
+  const fetchDevlogs = async (query: string = "", isMore: boolean = false) => {
     try {
       const response = await fetch(`https://ftpdb.jam06452.uk/api/random_devlogs`);
       const data = await response.json();
@@ -35,9 +34,13 @@ export default function Explore() {
         ? data.filter((d: any) => d.body.toLowerCase().includes(query.toLowerCase()) || d.user_display_name.toLowerCase().includes(query.toLowerCase()))
         : data;
 
-      setDevlogs(filtered);
-    } catch (e) { console.error("Devlog fetch error:", e); }
-    finally { setLoading(false); setIsFetchingMore(false); }
+      setDevlogs(prev => isMore ? [...prev, ...filtered] : filtered);
+    } catch (e) { 
+      console.error("Devlog fetch error:", e); 
+    } finally { 
+      setLoading(false); 
+      setIsFetchingMore(false); 
+    }
   };
 
   const fetchProjects = async (page: number, query: string = "") => {
@@ -66,7 +69,6 @@ export default function Explore() {
     finally { setLoading(false); setIsFetchingMore(false); }
   };
 
-
   useEffect(() => {
     setLoading(true);
     const delayDebounceFn = setTimeout(() => {
@@ -82,7 +84,10 @@ export default function Explore() {
     const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 100;
 
     if (isCloseToBottom && !isFetchingMore && !loading) {
-      if (activeTab === 'projects' && hasMoreProjects) {
+      if (activeTab === 'devlogs') {
+        setIsFetchingMore(true);
+        fetchDevlogs(searchQuery, true);
+      } else if (activeTab === 'projects' && hasMoreProjects) {
         setIsFetchingMore(true);
         const next = projectPage + 1;
         fetchProjects(next, searchQuery);
@@ -139,6 +144,7 @@ export default function Explore() {
               <View className="flex flex-col gap-3">
                 {devlogs.map((item, index) => (
                   <ExplorePageProjectDevlogCard 
+                  profilePic={item.user_avatar || "https://i0.wp.com/a.slack-edge.com/df10d/img/avatars/ava_0020-512.png?ssl=1"}
                     key={`log-${item.id}-${index}`}
                     username={item.user_display_name || "Member"}
                     time={new Date(item.created_at).toLocaleDateString()}
