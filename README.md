@@ -11,3 +11,7 @@ Flavortown mobile is a port of flavortown to androif and IOS (coming soon).
 - React Native
 - Expo
 - Ft api
+
+  # Requirements -
+  - User Id like 3953(take it from the url)
+  - FT api from user settings
