@@ -1,6 +1,6 @@
 # Flavortown Mobile
 
-Flavortown mobile is a port of flavortown to androif and IOS (coming soon). It allows you to view your stats like cookies and achievements, explore projects just like on the website.
+Flavortown mobile is a port of flavortown to android and IOS (coming soon). It allows you to view your stats like cookies and achievements, explore projects just like on the website.
 
 # How I got the idea? 
 So I always check ft on my phone but I did not like always having to go to chrome to access sop I decided to build this as basically my last app for ft!
@@ -25,4 +25,4 @@ So I always check ft on my phone but I did not like always having to go to chrom
   - User Id like 3953(take it from the url)
   - FT api from user settings
 
-Note thne website does look different on mobile. The scroll animation is only for desktop.
+Note the website does look different on mobile. The scroll animation is only for desktop.
