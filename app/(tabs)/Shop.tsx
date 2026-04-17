@@ -23,11 +23,25 @@ const REGIONS = [
   { label: "Global", value: "xx" },
 ];
 
+// Mapped to the specific strings from your console.log
+const CATEGORY = [
+  { label: "All Items", value: "all" },
+  { label: "Grants", value: "ShopItem::HCBGrant" },
+  { label: "HQ Items", value: "ShopItem::HQMailItem" },
+  { label: "Digital", value: "ShopItem::ThirdPartyDigital" },
+  { label: "Accessories", value: "ShopItem::Accessory" },
+  { label: "Stickers", value: "ShopItem::FreeStickers" },
+  { label: "Warehouse", value: "ShopItem::WarehouseItem" },
+  { label: "Hack Clubber Made", value: "ShopItem::HackClubberItem" },
+  { label: "Silly Items", value: "ShopItem::SillyItemType" },
+];
+
 export default function ShopPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("in");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const fetchShopItems = async () => {
     try {
@@ -44,20 +58,25 @@ export default function ShopPage() {
     }
   };
 
-  useEffect(() => { fetchShopItems(); }, []);
+  useEffect(() => { 
+    fetchShopItems(); 
+  }, []);
 
   const filteredAndSortedItems = useMemo(() => {
     return items
       .filter((item) => {
         const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-        return item.buyable_by_self && matchesSearch;
+        
+        const matchesCategory = selectedCategory === "all" || item.type === selectedCategory;
+        
+        return item.buyable_by_self && matchesSearch && matchesCategory;
       })
       .sort((a, b) => {
         const priceA = a.ticket_cost?.[selectedRegion] || a.ticket_cost?.base_cost || 0;
         const priceB = b.ticket_cost?.[selectedRegion] || b.ticket_cost?.base_cost || 0;
         return priceA - priceB;
       });
-  }, [items, searchQuery, selectedRegion]);
+  }, [items, searchQuery, selectedRegion, selectedCategory]);
 
   const renderItem = ({ item }: { item: any }) => {
     const isEnabledInRegion = item.enabled?.[`enabled_${selectedRegion}`];
@@ -74,10 +93,10 @@ export default function ShopPage() {
         />
         <View className="p-5">
           <View className="flex-row justify-between items-center mb-2">
-            <Text className="text-text text-xl flex-1" style={{ fontFamily: "Jua_400Regular" }}>
+            <Text className="text-white text-xl flex-1" style={{ fontFamily: "Jua_400Regular" }}>
               {item.name}
             </Text>
-            <View className="bg-accent px-3 py-1 rounded-full">
+            <View className="bg-[#ec8b34] px-3 py-1 rounded-full">
               <Text className="text-white font-bold">🍪 {itemPrice}</Text>
             </View>
           </View>
@@ -89,7 +108,7 @@ export default function ShopPage() {
           <TouchableOpacity 
             disabled={!isEnabledInRegion}
             onPress={() => Linking.openURL(`https://flavortown.hackclub.com/shop/order?shop_item_id=${item.id}`)}
-            className={`py-3 rounded-xl items-center ${isEnabledInRegion ? 'bg-accent' : 'bg-gray-600'}`}
+            className={`py-3 rounded-xl items-center ${isEnabledInRegion ? 'bg-[#ec8b34]' : 'bg-gray-600'}`}
           >
             <Text className="text-white font-bold">
               {isEnabledInRegion ? "View in Shop" : "Not Available in Region"}
@@ -103,11 +122,26 @@ export default function ShopPage() {
   return (
     <ImageBackground source={require("@/assets/BG.webp")} className="flex-1" resizeMode="cover">
       <View className="flex-1 px-6 pt-20">
-        <Text className="text-4xl text-black mb-6 text-center" style={{ fontFamily: "Jua_400Regular" }}>
+        <Text className="text-4xl text-white mb-6 text-center" style={{ fontFamily: "Jua_400Regular" }}>
           The Shop
         </Text>
 
-        <View className="bg-card rounded-2xl mb-4 border border-white/10 overflow-hidden">
+        <View className="bg-card rounded-2xl mb-4 border border-white/10 overflow-hidden flex flex-col">
+          {/* Technical Type Picker */}
+          <View className="border-b border-white/5">
+            <Picker
+              selectedValue={selectedCategory}
+              onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+              style={{ color: '#fff' }}
+              dropdownIconColor="#ec8b34"
+            >
+              {CATEGORY.map((c) => (
+                <Picker.Item key={c.value} label={c.label} value={c.value} />
+              ))}
+            </Picker>
+          </View>
+
+          {/* Region Picker */}
           <Picker
             selectedValue={selectedRegion}
             onValueChange={(itemValue) => setSelectedRegion(itemValue)}
@@ -125,7 +159,7 @@ export default function ShopPage() {
           placeholderTextColor="#9ca3af"
           value={searchQuery}
           onChangeText={setSearchQuery}
-          className="bg-card text-text p-4 rounded-2xl mb-6 border border-white/10"
+          className="bg-card text-white p-4 rounded-2xl mb-6 border border-white/10"
           style={{ fontFamily: "Jua_400Regular" }}
         />
 
@@ -139,7 +173,7 @@ export default function ShopPage() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 100 }}
             ListEmptyComponent={
-              <Text className="text-text text-center mt-10">No items found.</Text>
+              <Text className="text-white text-center mt-10">No items found matching this category.</Text>
             }
           />
         )}
