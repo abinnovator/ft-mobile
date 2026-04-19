@@ -47,7 +47,7 @@ export default function ShopPage() {
     try {
       const storedKey = await getApiKey();
       const response = await fetch("https://flavortown.hackclub.com/api/v1/store", {
-        headers: { "Authorization": `Bearer ${storedKey}` }
+        headers: { "Authorization": `Bearer ${storedKey}`, "X-Flavortown-Ext-19690": "true" }
       });
       const data = await response.json();
       setItems(Array.isArray(data) ? data : []);

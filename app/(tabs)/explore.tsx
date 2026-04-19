@@ -22,7 +22,7 @@ export default function Explore() {
   const getHeaders = async () => {
     const storedKey = await getApiKey();
     const activeKey = storedKey || process.env.BASE_FT_API || "";
-    return { "Authorization": `Bearer ${activeKey}`, "Accept": "application/json" };
+    return { "Authorization": `Bearer ${activeKey}`, "Accept": "application/json","X-Flavortown-Ext-19690": "true" };
   };
 
   const fetchDevlogs = async (query: string = "", isMore: boolean = false) => {

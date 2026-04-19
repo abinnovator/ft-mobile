@@ -25,7 +25,7 @@ export default function ProjectPage() {
     try {
       const key = await getApiKey();
       const myId = await getUserID();
-      const headers = { "Authorization": `Bearer ${key}` };
+      const headers = { "Authorization": `Bearer ${key}`, "X-Flavortown-Ext-19690": "true" };
 
       const projectUrl = `https://flavortown.hackclub.com/api/v1/projects/${id}`;
       const devlogsUrl = `https://flavortown.hackclub.com/api/v1/projects/${id}/devlogs?page=1&limit=40`;

@@ -64,7 +64,8 @@ const Profile = () => {
 
       const response = await fetch(`https://flavortown.hackclub.com/api/v1/users/${storedId}`, {
         headers: {
-          "Authorization": `Bearer ${activeKey}`
+          "Authorization": `Bearer ${activeKey}`,
+          "X-Flavortown-Ext-19690": "true"
         }
       }); 
       

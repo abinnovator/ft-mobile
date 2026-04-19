@@ -25,7 +25,7 @@ export default function Projects() {
       setHasAuth(true);
 
       const response = await fetch(`https://flavortown.hackclub.com/api/v1/users/${id}/projects`, {
-        headers: { "Authorization": `Bearer ${key}` }
+        headers: { "Authorization": `Bearer ${key}`, "X-Flavortown-Ext-19690": "true" }
       });
       
       const data = await response.json();

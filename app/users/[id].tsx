@@ -30,7 +30,7 @@ export default function UserProfilePage() {
     
     try {
       const key = await getApiKey();
-      const headers = { "Authorization": `Bearer ${key}` };
+      const headers = { "Authorization": `Bearer ${key}`, "X-Flavortown-Ext-19690": "true" };
 
       const userRes = await fetch(`https://flavortown.hackclub.com/api/v1/users/${id}`, { headers });
       const userData = await userRes.json();
