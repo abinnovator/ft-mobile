@@ -11,6 +11,14 @@
         "buildConfiguration": "Debug"
       }
     },
+    "simulator": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "buildConfiguration": "Debug",
+        "simulator": true
+      }
+    },
     "preview": {
       "distribution": "internal",
       "android": { "buildType": "apk" }
